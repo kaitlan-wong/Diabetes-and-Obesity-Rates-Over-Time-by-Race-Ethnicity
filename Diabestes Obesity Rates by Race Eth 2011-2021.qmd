@@ -1,0 +1,61 @@
+---
+title: "Texas Adults With Diabetes or Obesity by Race/Ethnicity, 2011-2021"
+author: "Kaitlan Wong"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(readxl)
+```
+
+```{r}
+# Read the Excel file
+data <- read_excel("C:/Users/kaitl/Documents/Every Texan/R/ADA/Race Eth by Disease/BRFSS diabetes + obesity combined 2011-2021.xlsx")
+
+# Print the first few rows of the data frame
+head(data)
+```
+
+```{r}
+# Convert disease rate variable to numeric
+data$`Percent Yes` <- as.numeric(data$`Percent Yes`)
+
+
+# Create line graph
+
+ggplot(data, aes(x = Year, y = `Percent Yes`,
+                 color = `Demographic Group`, linetype = Disease)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = c("Black or African American, non-Hispanic" = "#009E73", "Hispanic" = "#56B4E9", "White, non-Hispanic" = "#E69F00", "Other or Multi-Racial, non-Hispanic" = "#CC79A7"),
+                     breaks = c("Black or African American, non-Hispanic", "Hispanic", "White, non-Hispanic", "Other or Multi-Racial, non-Hispanic"),
+                     labels = c("Black or African American, \nnon-Hispanic", "Hispanic", "White,\nnon-Hispanic", "Other or Multi-Racial,\nnon-Hispanic")
+    ) +
+  scale_linetype_manual(values = c("Obesity" = "solid", "Diabetes" = "dotted")) +
+  labs(
+    x = "Year", 
+    y = "Percent With Disease", 
+    color = "Race/Ethnicity", 
+    linetype = "Disease",
+    title = "Percentage of Texas Adults With Diabetes or Obesity by Race/Ethnicity, \n2011-2021",
+    caption = "Source: Every Texan analysis of Texas Department of State Health Services BRFSS data."
+      ) +
+   scale_y_continuous(labels = scales::percent,
+                     limits = c(0, 0.5)) +  # Adjust the y-axis limits as needed
+  scale_x_continuous(breaks = data$Year) +  # Set breaks to include every year
+  theme_minimal() +
+  theme(legend.spacing.y = unit(.25, "cm"),
+        legend.text = element_text(margin = margin(r = 1)),
+        axis.title.y = element_text(margin = margin(r = 15)),
+        axis.text.y = element_text(margin = margin(r = 10)),
+        axis.text.x = element_text(angle = 45, hjust = 1),  # Angle and alignment of x-axis labels
+        plot.caption = element_text(hjust = 0, margin = margin(t = 10, l = 0))  # Left-align the caption with top and left margins)
+        )
+
+
+# Save the graph as an image
+ggsave("Disease Rates by race eth 2011-2021.png", width = 10, height = 6, units = "in")
+
+```
